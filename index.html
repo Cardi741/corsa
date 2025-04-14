@@ -4,67 +4,181 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timer Allenamento Intervallato</title>
-  <link rel="stylesheet" href="styles.css">
+  <!-- CSS Integrato -->
   <style>
-    /* CSS di esempio se non hai styles.css oppure per integrare alcune regole utili */
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+    /* Reset */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    
+    /* Contenitore principale, scrollabile se necessario */
     .container {
       width: 90%;
-      max-width: 1000px;
-      margin: auto;
-      padding: 1rem;
+      max-width: 400px;
+      max-height: 100vh;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      position: relative;
     }
-    h1, h2, h3 {
+    
+    /* Titolo sticky sempre visibile in alto */
+    .container h1 {
+      position: sticky;
+      top: 0;
+      background-color: white;
+      padding: 10px;
+      z-index: 1000;
       text-align: center;
+      border-bottom: 1px solid #ddd;
     }
+    
+    /* Accordion Styles */
     .accordion {
-      margin: 2rem 0;
+      padding: 10px;
     }
-    .accordion-section {
-      border: 1px solid #ccc;
-      margin-bottom: 1rem;
-      border-radius: 4px;
-      background: #fff;
+    
+    .accordion-section + .accordion-section {
+      margin-top: 10px;
     }
+    
     .accordion-header {
-      background: #ddd;
-      padding: 10px;
-      font-size: 1.2rem;
+      background-color: #eee;
       cursor: pointer;
-    }
-    .accordion-content {
       padding: 10px;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    .accordion-content {
       display: none;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
     }
+    
+    /* Stili per le sezioni interne */
+    .settings, .presets, .queue, .rapidita {
+      margin-bottom: 20px;
+    }
+    
+    .settings label, .queue-inputs label, .rapidita label {
+      display: block;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    
+    .settings input, .queue-inputs input, .rapidita input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      margin: 5px;
+    }
+    
+    button:disabled {
+      background-color: #ccc;
+    }
+    
+    .preset {
+      background-color: #2196F3;
+      font-size: 16px;
+    }
+    
+    .preset:hover {
+      background-color: #1E88E5;
+    }
+    
+    .queue {
+      text-align: left;
+    }
+    
+    #addRound {
+      background-color: #FF9800;
+    }
+    
+    #queueList {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+    
+    #queueList li {
+      margin: 5px 0;
+      background: #e3e3e3;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    /* Timer Fisso in fondo */
     .fixed-timer {
-      position: fixed;
+      position: sticky;
       bottom: 0;
-      left: 0;
-      right: 0;
-      background: #333;
-      color: #fff;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      flex-wrap: wrap;
+      background-color: white;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      z-index: 1000;
     }
+    
+    /* Timer display e controlli */
     .timer-display {
       text-align: center;
     }
-    .timer-display h2 {
-      margin-bottom: 10px;
+    
+    #time-left {
+      font-size: 50px;
+      font-weight: bold;
+      margin: 10px 0;
     }
-    .controls button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 1rem;
-      cursor: pointer;
+    
+    #phase {
+      font-size: 24px;
+      color: #666;
+    }
+    
+    .controls {
+      text-align: center;
+    }
+    
+    /* Sezione Rapidità */
+    .rapidita {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    #rapidita-status {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #d9534f;
+      text-align: center;
     }
   </style>
 </head>
@@ -75,6 +189,7 @@
     
     <!-- Sezione Accordion: contiene le tre macro aree -->
     <div class="accordion">
+      
       <!-- Sezione 1: Allenamento Intervallato e Pre-set -->
       <div class="accordion-section">
         <div class="accordion-header">Allenamento Intervallato e Pre-set</div>
@@ -143,7 +258,7 @@
       
     </div>
     
-    <!-- Timer Fisso: sempre visibile in basso -->
+    <!-- Timer Fisso: sempre visibile in fondo -->
     <div class="fixed-timer">
       <div class="timer-display">
         <h2 id="phase">In attesa...</h2>
@@ -155,155 +270,267 @@
       </div>
     </div>
     
-    <!-- Inserisci il file audio per il beep -->
+    <!-- File audio per beep -->
     <audio id="beep" src="beep.mp3" preload="auto"></audio>
   </div>
   
+  <!-- JavaScript Integrato -->
   <script>
-    /***************************
-     *  Funzionalità Accordion *
-     ***************************/
-    document.querySelectorAll('.accordion-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const content = header.nextElementSibling;
-        content.style.display = (content.style.display === "block") ? "none" : "block";
-      });
-    });
+    document.addEventListener('DOMContentLoaded', () => {
+      // Variabili globali per il timer e le impostazioni base
+      let workTime = 30;
+      let restTime = 15;
+      let rounds = 5;
+      let isRunning = false;
+      let currentRound = 0;
+      let timerInterval;
+      let timeLeft;
+      let isWorkPhase = true;
+      
+      // Variabile per la coda degli esercizi (es. playlist di round)
+      let exerciseQueue = [];
+      
+      // Elementi del DOM per il timer
+      const phaseDisplay = document.getElementById('phase');
+      const timeDisplay = document.getElementById('time-left');
+      const startButton = document.getElementById('startButton');
+      const pauseButton = document.getElementById('pauseButton');
+      const beep = document.getElementById('beep');
+      
+      // Funzioni per salvare/caricare le impostazioni con localStorage
+      function loadSettings() {
+        const savedWorkTime = localStorage.getItem('workTime');
+        const savedRestTime = localStorage.getItem('restTime');
+        const savedRounds = localStorage.getItem('rounds');
+        
+        if (savedWorkTime) workTime = parseInt(savedWorkTime);
+        if (savedRestTime) restTime = parseInt(savedRestTime);
+        if (savedRounds) rounds = parseInt(savedRounds);
+        
+        document.getElementById('workTime').value = workTime;
+        document.getElementById('restTime').value = restTime;
+        document.getElementById('rounds').value = rounds;
+      }
+      
+      function saveSettings() {
+        localStorage.setItem('workTime', workTime);
+        localStorage.setItem('restTime', restTime);
+        localStorage.setItem('rounds', rounds);
+      }
+      
+      // Pre-set di allenamenti
+      const presets = {
+        hiit: { workTime: 20, restTime: 10, rounds: 8 },
+        tabata: { workTime: 30, restTime: 10, rounds: 8 },
+        pwm: { workTime: 40, restTime: 20, rounds: 6 },
+        corsa: { workTime: 20, restTime: 40, rounds: 20 }
+      };
+      
+      function applyPreset(presetName) {
+        const preset = presets[presetName];
+        if (preset) {
+          document.getElementById('workTime').value = preset.workTime;
+          document.getElementById('restTime').value = preset.restTime;
+          document.getElementById('rounds').value = preset.rounds;
+          
+          workTime = preset.workTime;
+          restTime = preset.restTime;
+          rounds = preset.rounds;
+          saveSettings();
+        }
+      }
+      
+      // Associa i click ai pulsanti pre-set
+      document.getElementById('preset-hiit').addEventListener('click', () => applyPreset('hiit'));
+      document.getElementById('preset-tabata').addEventListener('click', () => applyPreset('tabata'));
+      document.getElementById('preset-pwm').addEventListener('click', () => applyPreset('pwm'));
+      document.getElementById('preset-corsa').addEventListener('click', () => applyPreset('corsa'));
+      
+      // Funzioni per la coda degli esercizi
+      function addRoundToQueue() {
+        const qWorkTime = parseInt(document.getElementById('queue-workTime').value);
+        const qRestTime = parseInt(document.getElementById('queue-restTime').value);
+        exerciseQueue.push({ workTime: qWorkTime, restTime: qRestTime });
+        updateQueueDisplay();
+      }
+      
+      function updateQueueDisplay() {
+        const queueList = document.getElementById('queueList');
+        queueList.innerHTML = "";
+        exerciseQueue.forEach((round, index) => {
+          const li = document.createElement('li');
+          li.textContent = `Round ${index + 1}: ${round.workTime}s lavoro, ${round.restTime}s recupero`;
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = "Rimuovi";
+          removeBtn.style.marginLeft = "10px";
+          removeBtn.addEventListener('click', () => removeRoundFromQueue(index));
+          li.appendChild(removeBtn);
+          queueList.appendChild(li);
+        });
+      }
+      
+      function removeRoundFromQueue(index) {
+        exerciseQueue.splice(index, 1);
+        updateQueueDisplay();
+      }
+      
+      document.getElementById('addRound').addEventListener('click', addRoundToQueue);
+      
+      // Funzione per aggiornare il display del timer (mm:ss)
+      function updateTimerDisplay(time) {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+      
+      /* MODALITÀ STANDARD (senza coda) */
+      function nextPhase() {
+        // Se abbiamo esaurito i round, termina l'allenamento
+        if (currentRound >= rounds) {
+          phaseDisplay.textContent = "Allenamento Completato!";
+          timeDisplay.textContent = "00:00";
+          clearInterval(timerInterval);
+          isRunning = false;
+          startButton.textContent = 'Avvia';
+          pauseButton.disabled = true;
+          return;
+        }
+        
+        timeLeft = isWorkPhase ? workTime : restTime;
+        phaseDisplay.textContent = isWorkPhase ? "Lavoro!" : "Recupero!";
+        updateTimerDisplay(timeLeft);
+        
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay(timeLeft);
     
-    /**********************************
-     * Timer: Lavoro/Recupero con Beep *
-     **********************************/
-    
-    // Elementi HTML del timer
-    const phaseDisplay = document.getElementById('phase');
-    const timeLeftDisplay = document.getElementById('time-left');
-    const startButton = document.getElementById('startButton');
-    const pauseButton = document.getElementById('pauseButton');
-    const beepAudio = document.getElementById('beep');
-    
-    // Input per le impostazioni
-    const inputWorkTime = document.getElementById('workTime');
-    const inputRestTime = document.getElementById('restTime');
-    const inputRounds = document.getElementById('rounds');
-    
-    // Variabili per il timer
-    let timerInterval = null;
-    let currentPhase = 'work'; // "work" oppure "rest"
-    let currentRound = 0;
-    let totalRounds = 0;
-    let remainingTime = 0;
-    
-    // Funzione per formattare il tempo (mm:ss)
-    function formatTime(seconds) {
-      let m = Math.floor(seconds / 60);
-      let s = seconds % 60;
-      m = m < 10 ? "0" + m : m;
-      s = s < 10 ? "0" + s : s;
-      return `${m}:${s}`;
-    }
-    
-    // Aggiorna il display del timer
-    function updateTimerDisplay() {
-      timeLeftDisplay.textContent = formatTime(remainingTime);
-      phaseDisplay.textContent = currentPhase === 'work' ? "Fase di LAVORO" : "Fase di RECUPERO";
-    }
-    
-    // Funzione per far suonare il beep, con gestione degli errori (alcuni browser richiedono interazione)
-    function playBeep() {
-      beepAudio.play().catch(error => {
-        console.log("Impossibile riprodurre il suono:", error);
-      });
-    }
-    
-    // Funzione che gestisce il tick del timer
-    function timerTick() {
-      remainingTime--;
-      updateTimerDisplay();
-    
-      // Se il countdown arriva a zero…
-      if (remainingTime < 0) {
-        // Suona il beep alla fine di ogni fase
-        playBeep();
-    
-        // Se la fase corrente è di lavoro, passa alla fase di recupero
-        if (currentPhase === 'work') {
-          currentPhase = 'rest';
-          remainingTime = parseInt(inputRestTime.value, 10);
-        } else {
-          // Se la fase era di recupero, incrementa il round
-          currentRound++;
-          // Se abbiamo raggiunto il numero totale di round, ferma il timer e notifica
-          if (currentRound >= totalRounds) {
+          if (timeLeft <= 0) {
+            beep.play();
+            isWorkPhase = !isWorkPhase;
+            if (isWorkPhase) currentRound++;
             clearInterval(timerInterval);
-            timerInterval = null;
-            phaseDisplay.textContent = "Allenamento completato!";
-            remainingTime = 0;
+            nextPhase();
+          }
+        }, 1000);
+      }
+      
+      /* MODALITÀ QUEUE: utilizza i round della coda degli esercizi */
+      function nextPhaseQueue() {
+        if (currentRound >= exerciseQueue.length) {
+          phaseDisplay.textContent = "Allenamento Completato!";
+          timeDisplay.textContent = "00:00";
+          clearInterval(timerInterval);
+          isRunning = false;
+          startButton.textContent = 'Avvia';
+          pauseButton.disabled = true;
+          return;
+        }
+        
+        const currentData = exerciseQueue[currentRound];
+        timeLeft = isWorkPhase ? currentData.workTime : currentData.restTime;
+        phaseDisplay.textContent = isWorkPhase
+          ? `Round ${currentRound + 1} - Lavoro!`
+          : `Round ${currentRound + 1} - Recupero!`;
+        updateTimerDisplay(timeLeft);
+        
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay(timeLeft);
+    
+          if (timeLeft <= 0) {
+            beep.play();
+            isWorkPhase = !isWorkPhase;
+            if (isWorkPhase) currentRound++;
+            clearInterval(timerInterval);
+            nextPhaseQueue();
+          }
+        }, 1000);
+      }
+      
+      // Funzione per avviare/fermare il timer
+      function startTimer() {
+        if (isRunning) {
+          clearInterval(timerInterval);
+          isRunning = false;
+          startButton.textContent = 'Avvia';
+          pauseButton.disabled = true;
+        } else {
+          isRunning = true;
+          currentRound = 0;
+          isWorkPhase = true;
+          startButton.textContent = 'Ferma';
+          pauseButton.disabled = false;
+    
+          // Se esiste almeno un round in coda, usa la modalità Queue
+          if (exerciseQueue.length > 0) {
+            nextPhaseQueue();
           } else {
-            // Altrimenti, ripristina la fase di lavoro
-            currentPhase = 'work';
-            remainingTime = parseInt(inputWorkTime.value, 10);
+            nextPhase();
           }
         }
-        updateTimerDisplay();
       }
-    }
-    
-    // Funzione per avviare il timer
-    function startTimer() {
-      // Leggi le impostazioni
-      const workTimeVal = parseInt(inputWorkTime.value, 10);
-      const restTimeVal = parseInt(inputRestTime.value, 10);
-      totalRounds = parseInt(inputRounds.value, 10);
-    
-      // Inizializza il timer solo se i valori sono validi
-      if (workTimeVal > 0 && restTimeVal > 0 && totalRounds > 0) {
-        currentPhase = 'work';
-        currentRound = 0;
-        remainingTime = workTimeVal;
-        updateTimerDisplay();
-        startButton.disabled = true;
-        pauseButton.disabled = false;
-    
-        // Avvia il countdown ogni secondo
-        timerInterval = setInterval(timerTick, 1000);
-      } else {
-        alert("Controlla i valori inseriti per lavoro, recupero e round.");
+      
+      startButton.addEventListener('click', startTimer);
+      pauseButton.addEventListener('click', startTimer);
+      
+      document.getElementById('saveSettings').addEventListener('click', () => {
+        workTime = parseInt(document.getElementById('workTime').value);
+        restTime = parseInt(document.getElementById('restTime').value);
+        rounds = parseInt(document.getElementById('rounds').value);
+        saveSettings();
+      });
+      
+      document.getElementById('loadSettings').addEventListener('click', loadSettings);
+      
+      // Funzione per l'Esercizio di Rapidità
+      function startRapidita() {
+        const minSec = parseInt(document.getElementById('minSeconds').value);
+        const maxSec = parseInt(document.getElementById('maxSeconds').value);
+        const statusEl = document.getElementById('rapidita-status');
+        
+        if (isNaN(minSec) || isNaN(maxSec) || minSec < 0 || maxSec < minSec) {
+          statusEl.textContent = "Controlla i valori inseriti";
+          return;
+        }
+        statusEl.textContent = "";
+        
+        // Genera un tempo casuale nell'intervallo
+        const randomDelay = Math.floor(Math.random() * (maxSec - minSec + 1)) + minSec;
+        
+        // Countdown per l'esercizio di rapidità
+        let remaining = randomDelay;
+        statusEl.textContent = `Aspetta ${remaining} secondi...`;
+        
+        const interval = setInterval(() => {
+          remaining--;
+          statusEl.textContent = `Aspetta ${remaining} secondi...`;
+          if (remaining <= 0) {
+            clearInterval(interval);
+            beep.play();
+            statusEl.textContent = "Beep! Partito!";
+          }
+        }, 1000);
       }
-    }
-    
-    // Funzione per mettere in pausa il timer
-    function pauseTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        startButton.disabled = false;
-        pauseButton.disabled = true;
-      }
-    }
-    
-    // Gestori per i pulsanti
-    startButton.addEventListener('click', startTimer);
-    pauseButton.addEventListener('click', pauseTimer);
-    
-    // Inizializza il display del timer
-    updateTimerDisplay();
-    
-    /********************************************
-     * Eventuali Gestori per Preset e Impostazioni *
-     ********************************************/
-    
-    // Esempio di preset: HIIT (20s lavoro / 10s recupero / 8 round)
-    document.getElementById('preset-hiit').addEventListener('click', () => {
-      inputWorkTime.value = 20;
-      inputRestTime.value = 10;
-      inputRounds.value = 8;
+      
+      document.getElementById('startRapidita').addEventListener('click', startRapidita);
+      
+      // Inizializzazione al caricamento della pagina
+      loadSettings();
+      
+      // Comportamento dell'Accordion: cliccando sull'intestazione, espande o contrae la sezione successiva
+      const headers = document.querySelectorAll('.accordion-header');
+      headers.forEach(header => {
+        header.addEventListener('click', () => {
+          const content = header.nextElementSibling;
+          if (content.style.display === "block") {
+            content.style.display = "none";
+          } else {
+            content.style.display = "block";
+          }
+        });
+      });
+      
     });
-    // Aggiungi ulteriori preset se necessario...
-    
-    // Gli eventi per "Salva Allenamento", "Carica Allenamento" e "Coda degli esercizi"
-    // possono essere gestiti integrando localStorage o una logica specifica
-    // Questo esempio fornisce la base per il timer con beep.
-    
   </script>
 </body>
 </html>
